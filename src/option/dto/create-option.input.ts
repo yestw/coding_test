@@ -1,5 +1,5 @@
 import { Field, ArgsType, Int } from '@nestjs/graphql';
-import { IsArray, IsNotEmpty, Length, ArrayMinSize } from 'class-validator';
+import { IsNotEmpty, Length } from 'class-validator';
 
 @ArgsType()
 export class CreateOptionDto {

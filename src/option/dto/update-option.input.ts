@@ -1,6 +1,6 @@
 import { CreateOptionDto } from './create-option.input';
 import { Field, Int, PartialType, ArgsType } from '@nestjs/graphql';
-import { IsArray, IsNotEmpty, Length, IsNumber } from 'class-validator';
+import { IsNotEmpty, Length } from 'class-validator';
 
 @ArgsType()
 export class UpdateOptionDto extends PartialType(CreateOptionDto) {
