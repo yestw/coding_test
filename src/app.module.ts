@@ -10,7 +10,6 @@ import { SurveyModule } from './survey/survey.module';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
-import { LoggerModule } from './logger/logger.module';
 import { QuestionModule } from './question/question.module';
 import { OptionModule } from './option/option.module';
 import { AnswerModule } from './answer/answer.module';
@@ -41,7 +40,7 @@ import { HttpExceptionFilter } from './common/middleware/http-exception.filter';
         return { message, code };
       },
     }),
-    SurveyModule, LoggerModule, QuestionModule, OptionModule, AnswerModule
+    SurveyModule, QuestionModule, OptionModule, AnswerModule
   ],
   controllers: [AppController],
   providers: [
