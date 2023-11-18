@@ -8,12 +8,16 @@ import { Options } from '../option/entities/option.entity';
 import { QuestionException } from './exception/exception.message';
 import { SurveysException } from 'src/survey/exception/exception.message';
 import { CustomException } from 'src/common/middleware/http-exceptions';
+import { OptionRepository } from 'src/option/repository/option.repository';
+import { AnswerRepository } from 'src/answer/repository/answer.repository';
 
 @Injectable()
 export class QuestionService {
   constructor(
     private readonly questionRepository: QuestionRepository,
     private readonly surveyRepository: SurveyRepository,
+    private readonly optionRepository: OptionRepository,
+    private readonly answerRepository: AnswerRepository,
   ) { };
 
   private readonly logger = new Logger(QuestionService.name);
@@ -82,11 +86,11 @@ export class QuestionService {
   async remove(id: number) {
     try {
       const question = await this.questionValidation(id);
-      try {
-        await this.questionRepository.delete(question.id);
-      } catch (err) {
-        this.logger.error('문항 삭제에 실패했습니다.');
-      }
+
+      await this.optionRepository.delete({question_id: {id : question.id}});
+      await this.answerRepository.delete({question_id: {id : question.id}});
+
+      await this.questionRepository.delete(question.id);
     } catch (err) {
       return err;
     }
