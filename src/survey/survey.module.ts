@@ -6,12 +6,13 @@ import { Surveys } from './entities/survey.entities';
 import { SurveyRepository } from './repository/survey.repository';
 import { QuestionRepository } from '../question/repository/question.repository';
 import { OptionRepository } from '../option/repository/option.repository';
+import { AnswerRepository } from 'src/answer/repository/answer.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Surveys])],
   providers: [
     SurveyService, SurveyResolver, SurveyRepository,
-    QuestionRepository, OptionRepository,
+    QuestionRepository, OptionRepository, AnswerRepository,
   ]
 })
 export class SurveyModule {}

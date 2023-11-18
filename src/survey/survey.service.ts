@@ -9,12 +9,17 @@ import { Options } from '../option/entities/option.entity';
 import { Answers } from '../answer/entities/answer.entity';
 import { CustomException } from 'src/common/middleware/http-exceptions';
 import { SurveysException } from './exception/exception.message';
+import { OptionRepository } from 'src/option/repository/option.repository';
+import { AnswerRepository } from 'src/answer/repository/answer.repository';
+
 
 @Injectable()
 export class SurveyService {
   constructor(
     private readonly surveyRepository: SurveyRepository,
     private readonly questionRepository: QuestionRepository,
+    private readonly optionRepository: OptionRepository,
+    private readonly answerRepositoy: AnswerRepository,
   ) { }
 
   private readonly logger = new Logger(SurveyService.name);
@@ -93,12 +98,20 @@ export class SurveyService {
       const survey = await this.surveyValidation(id);
 
       const survey_id = survey.id;
-      await this.questionRepository.delete({ survey_id: { id: survey_id } });
+      await this.deleteQuestion(survey_id);
       await this.surveyRepository.delete(survey.id);
 
     } catch(err) {
       return err;
     }
+  }
+
+  //단방향 연관관계로 자식 데이터 먼저 삭제
+  async deleteQuestion(id: number) {
+    const question = await this.questionRepository.findOne({where: {survey_id: {id: id}}});
+    await this.answerRepositoy.delete({question_id: {id: question.id}});
+    await this.optionRepository.delete({question_id: {id: question.id}});
+    await this.questionRepository.delete({ survey_id: { id: id } });
   }
 
   //설문지 조회시 없으면 발생하는 예외
