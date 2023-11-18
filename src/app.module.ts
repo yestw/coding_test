@@ -15,6 +15,8 @@ import { QuestionModule } from './question/question.module';
 import { OptionModule } from './option/option.module';
 import { AnswerModule } from './answer/answer.module';
 import { ConfigModule, ConfigService  } from "@nestjs/config";
+import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from './common/middleware/http-exception.filter';
 
 @Module({
   imports: [
@@ -33,7 +35,10 @@ import { ConfigModule, ConfigService  } from "@nestjs/config";
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       formatError: (err) => {
         console.log(err);
-        return err;
+
+        const  { message, extensions } = err;
+        const { code } = extensions;
+        return { message, code };
       },
     }),
     SurveyModule, LoggerModule, QuestionModule, OptionModule, AnswerModule
@@ -41,6 +46,10 @@ import { ConfigModule, ConfigService  } from "@nestjs/config";
   controllers: [AppController],
   providers: [
     AppService, Logger,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    }
   ],
 })
 export class AppModule{}
