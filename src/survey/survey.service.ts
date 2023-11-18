@@ -109,9 +109,11 @@ export class SurveyService {
   //단방향 연관관계로 자식 데이터 먼저 삭제
   async deleteQuestion(id: number) {
     const question = await this.questionRepository.findOne({where: {survey_id: {id: id}}});
-    await this.answerRepositoy.delete({question_id: {id: question.id}});
-    await this.optionRepository.delete({question_id: {id: question.id}});
-    await this.questionRepository.delete({ survey_id: { id: id } });
+    if(question) {
+      await this.answerRepositoy.delete({question_id: {id: question.id}});
+      await this.optionRepository.delete({question_id: {id: question.id}});
+      await this.questionRepository.delete({ survey_id: { id: id } });
+    }
   }
 
   //설문지 조회시 없으면 발생하는 예외
