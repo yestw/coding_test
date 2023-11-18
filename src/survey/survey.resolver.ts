@@ -14,27 +14,19 @@ export class SurveyResolver {
     return newSurvey;
   }
 
-  @Query(() => [Surveys], {description: '전체 설문지 조회'})
+  @Query(() => [Surveys], {name: 'findAllSurveys', description: '전체 설문지 조회'})
   async findAll(): Promise<Surveys[]> {
     return await this.surveyService.findAll();
   }
 
-  @Query(() => Surveys, {description: '설문지id로 특정 설문지 조회'})
+  @Query(() => Surveys, {name: 'findSurveyById', description: '설문지id로 특정 설문지 조회'})
   async findOne(@Args('id', { type: () => Int }) id: number) {
-    try {
-      return await this.surveyService.findOneById(id);
-    } catch (err) {
-      return err;
-    }
+    return await this.surveyService.findOneById(id);
   }
   
   @Mutation(() => Surveys, {description: '설문지 수정', nullable: true})
   async updateSurvey(@Args() updateDto: UpdateSurveyDto) {
-    try {
-      await this.surveyService.updateSurvey(updateDto);
-    } catch (err) {
-      return err;
-    }
+    await this.surveyService.updateSurvey(updateDto);
   }
 
   @Mutation(() => Surveys, {description: '설문지 삭제', nullable : true})

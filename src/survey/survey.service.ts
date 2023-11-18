@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Surveys } from './entities/survey.entities';
 import { SurveyRepository } from './repository/survey.repository';
 import { CreateSurveysDto } from './dto/create-survey.input';
@@ -7,7 +7,8 @@ import { QuestionRepository } from '../question/repository/question.repository';
 import { Questions } from '../question/entities/question.entity';
 import { Options } from '../option/entities/option.entity';
 import { Answers } from '../answer/entities/answer.entity';
-import HttpError from 'src/exception/http.error';
+import { CustomException } from 'src/common/middleware/http-exceptions';
+import { SurveysException } from './exception/exception.message';
 
 @Injectable()
 export class SurveyService {
@@ -20,23 +21,13 @@ export class SurveyService {
 
   //설문지 등록
   async create(createDto: CreateSurveysDto): Promise<Surveys> {
-    try {
-      const newSurvey = this.surveyRepository.create(createDto);
-      return await this.surveyRepository.save(newSurvey);
-    } catch (err) {
-      this.logger.error(err);
-      throw new HttpError(500, '설문지 등록에 실패하였습니다.');
-    }
+    const newSurvey = this.surveyRepository.create(createDto);
+    return await this.surveyRepository.save(newSurvey);
   }
 
   //설문지 전체 조회
   async findAll(): Promise<Surveys[]> {
-    try {
-      return await this.surveyRepository.find();
-    } catch (err) {
-      this.logger.error(err);
-      throw new HttpException('설문지 조회에 실패하였습니다.', HttpStatus.BAD_REQUEST);
-    }
+    return await this.surveyRepository.find();
   }
 
   //설문지id로 특정 설문지 조회
@@ -44,50 +35,44 @@ export class SurveyService {
     try {
       await this.surveyValidation(id);
 
-      try {
-        const surveys = await this.surveyRepository.createQueryBuilder('survey')
-        .leftJoinAndMapMany(
-          'survey.questions',
-          Questions,
-          'questions',
-          'survey.id = questions.survey_id',
-        )
-        .leftJoinAndMapMany(
-          'questions.options',
-          Options,
-          'options',
-          'questions.id = options.question_id'
-        )
-        .leftJoinAndMapMany(
-          'questions.answers',
-          Answers,
-          'answers',
-          'questions.id = answers.question_id'
-        )
-        .where('survey.id = :id', { id })
-        .getOne();
+      const surveys = await this.surveyRepository.createQueryBuilder('survey')
+      .leftJoinAndMapMany(
+        'survey.questions',
+        Questions,
+        'questions',
+        'survey.id = questions.survey_id',
+      )
+      .leftJoinAndMapMany(
+        'questions.options',
+        Options,
+        'options',
+        'questions.id = options.question_id'
+      )
+      .leftJoinAndMapMany(
+        'questions.answers',
+        Answers,
+        'answers',
+        'questions.id = answers.question_id'
+      )
+      .where('survey.id = :id', { id })
+      .getOne();
 
-        const { questions } = surveys;
+      const { questions } = surveys;
 
-        let sum = 0;
-        questions.forEach((question) => {
-          const { answers } = question;
-          answers.forEach((answer) => {
-            sum+=answer.score;
-          })
+      let sum = 0;
+      questions.forEach((question) => {
+        const { answers } = question;
+        answers.forEach((answer) => {
+          sum+=answer.score;
         })
-        surveys.totalScore = sum;
+      })
+      surveys.totalScore = sum;
 
-        
-        return surveys;
-  
-      } catch (err) {
-        this.logger.error(err);
-        throw new HttpError(500, '선택하신 설문지 조회에 실패하였습니다.');
-      } 
+      
+      return surveys;
 
     } catch (err) {
-      throw err;
+      return err;
     } 
   }
 
@@ -96,15 +81,10 @@ export class SurveyService {
   async updateSurvey(updateDto: UpdateSurveyDto) {
     try {
       const survey = await this.surveyValidation(updateDto.id);
-      
-      try {
-        await this.surveyRepository.update(survey.id, updateDto);
-      } catch (err) {
-        this.logger.error(err);
-        throw new HttpException('설문지 수정에 실패하였습니다.', HttpStatus.BAD_REQUEST);
-      }
+      await this.surveyRepository.update(survey.id, updateDto);
+
     } catch (err) {
-      throw err;
+      return err;
     }
   }
 
@@ -113,16 +93,12 @@ export class SurveyService {
   async deleteSurvey(id: number) {
     try {
       const survey = await this.surveyValidation(id);
-      
-      try {
-        await this.questionRepository.delete({survey_id: survey.options});
-        await this.surveyRepository.delete(survey.id);
-      } catch (err) {
-        this.logger.error(err);
-        throw new HttpException('설문지 삭제에 실패하였습니다.', HttpStatus.BAD_REQUEST);
-      }
+
+      await this.questionRepository.delete({survey_id: survey.options});
+      await this.surveyRepository.delete(survey.id);
+
     } catch(err) {
-      throw err;
+      return err;
     }
   }
 
@@ -133,7 +109,7 @@ export class SurveyService {
     survey = await this.surveyRepository.findOne({ where: { id: id } });
     if (!survey) {
       this.logger.error('존재하지 않는 설문지 입니다.');
-      throw new HttpError(500, '존재하지 않는 설문지 입니다.');
+      throw new CustomException(SurveysException.SURVEY_NOT_EXISTS);
     }
     return survey;
   }
