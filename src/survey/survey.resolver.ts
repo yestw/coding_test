@@ -30,7 +30,7 @@ export class SurveyResolver {
   }
 
   @Mutation(() => Surveys, {description: '설문지 삭제', nullable : true})
-  async deleteSurvey(@Args('id')id: number) {
+  async deleteSurvey(@Args('id', { type: () => Int })id: number) {
     return await this.surveyService.deleteSurvey(id);
   }
 }

@@ -25,5 +25,5 @@ export class Surveys {
     answers?: Answers[];
 
     @Field({nullable:true})
-    totalScore: number;
+    totalScore?: number;
 }

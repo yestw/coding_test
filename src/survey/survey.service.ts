@@ -68,9 +68,7 @@ export class SurveyService {
       })
       surveys.totalScore = sum;
 
-      
       return surveys;
-
     } catch (err) {
       return err;
     } 
@@ -94,7 +92,8 @@ export class SurveyService {
     try {
       const survey = await this.surveyValidation(id);
 
-      await this.questionRepository.delete({survey_id: survey.options});
+      const survey_id = survey.id;
+      await this.questionRepository.delete({ survey_id: { id: survey_id } });
       await this.surveyRepository.delete(survey.id);
 
     } catch(err) {
