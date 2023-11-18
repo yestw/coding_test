@@ -1,0 +1,99 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Options {
+  id: Int!
+  option_content: String
+  score: Float
+  question_id: Questions!
+  options: [Options!]
+}
+
+type Answers {
+  id: Int!
+  answer_content: String
+  score: Float
+  answers: [Answers!]
+}
+
+type Questions {
+  id: Int!
+  question_title: String
+  survey_id: Surveys!
+  options: [Options!]
+  answers: [Answers!]
+}
+
+type Surveys {
+  id: Int!
+  title: String
+  questions: [Questions!]
+  options: [Options!]
+  answers: [Answers!]
+  totalScore: Float
+}
+
+type Query {
+  """전체 설문지 조회"""
+  findAllSurveys: [Surveys!]!
+
+  """설문지id로 특정 설문지 조회"""
+  findSurveyById(id: Int!): Surveys!
+
+  """전체 문항 조회"""
+  findAllQuestions: [Questions!]!
+
+  """문항id로 특정 문항 조회"""
+  findQuestionById(id: Int!): Questions!
+
+  """전체 선택지 조회"""
+  findAllOptions: [Options!]!
+
+  """선택지id로 특정 선택지 조회"""
+  findOptionById(id: Int!): Options!
+
+  """전체 답변 조회"""
+  findAllAnswers: [Answers!]!
+
+  """답변id로 특정 답변 조회"""
+  findAnswerById(id: Int!): Answers!
+}
+
+type Mutation {
+  """설문지 등록"""
+  createSurvey(title: String!): Surveys!
+
+  """설문지 수정"""
+  updateSurvey(title: String!, id: Int!): Surveys
+
+  """설문지 삭제"""
+  deleteSurvey(id: Int!): Surveys
+
+  """문항 등록"""
+  createQuestion(question_title: String!, survey_id: Float!): Questions!
+
+  """문항 수정"""
+  updateQuestion(question_title: String!, survey_id: Float, id: Int!): Questions
+
+  """문항 삭제"""
+  deleteQuestion(id: Int!): Questions
+
+  """선택지 등록"""
+  createOption(option_content: [String!]!, question_id: Float!, score: [Int!]!): [Options!]!
+
+  """선택지 수정"""
+  updateOption(option_content: [String!]!, question_id: Float, score: [Int!], id: [Int!]!): Options
+
+  """선택지 삭제"""
+  deleteOption(id: Int!): Options
+
+  """답변 등록"""
+  createAnswer(answer_content: [String!]!, question_id: Float!): [Answers!]!
+
+  """답변 수정"""
+  updateAnswer(answer_content: [String!]!, question_id: Float!): Answers
+
+  """답변 삭제"""
+  deleteAnswer(id: Int!): Answers
+}
