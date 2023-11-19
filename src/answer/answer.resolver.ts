@@ -24,9 +24,10 @@ export class AnswerResolver {
     return await this.answerService.findOne(id);
   }
 
-  @Mutation(() => Answers, {description: '답변 수정', nullable: true})
-  async updateAnswer(@Args() updateDto: UpdateAnswerDto) {
-    return await this.answerService.update(updateDto);
+  @Mutation(() => [Answers], {description: '답변 수정', nullable: true})
+  async updateAnswer(@Args() updateDto: UpdateAnswerDto): Promise<Answers[]> {
+    const updateAnwser = await this.answerService.update(updateDto);
+    return updateAnwser
   }
 
   @Mutation(() => Answers, {description: '답변 삭제', nullable: true})

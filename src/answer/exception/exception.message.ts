@@ -10,4 +10,9 @@ export class AnswerException {
         code: 'A002',
         message: '선택지에 없는 답변입니다.',
     }
+
+    static ANSWER_DUPLICATE: ExceptionObj = {
+        code: 'A003',
+        message: '이미 등록되어 있는 답변입니다.'
+    }
 }

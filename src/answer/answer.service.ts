@@ -53,7 +53,11 @@ export class AnswerService {
       //최종 답변 등록
       const saveAnswers: Answers[] = await Promise.all(
         createDto.answer_content.map(async (answer) => {
-          const find = await this.answerRepository.find({where: {answer_content: answer}});
+          const question_id = createDto.question_id;
+          const find = await this.answerRepository.createQueryBuilder('answer')
+            .where('answer.answer_content = :answer', {answer : answer})
+            .andWhere('answer.question_id = :question_id', {question_id : question_id})
+            .getMany();
           if(find.length < 1) {
             const newAnswer = new Answers();
             newAnswer.answer_content = answer;
@@ -61,10 +65,11 @@ export class AnswerService {
             newAnswer.score = score.shift();
 
             return this.answerRepository.save(newAnswer);
+          } else {
+            throw new CustomException(AnswerException.ANSWER_DUPLICATE);
           }
         })
       )
-
       return saveAnswers;
     } catch(err) {
       return err;
@@ -89,7 +94,7 @@ export class AnswerService {
   }
 
   //답변 수정
-  async update(updateDto: UpdateAnswerDto) {
+  async update(updateDto: UpdateAnswerDto): Promise<Answers[]> {
     try {
       await this.answerRepository.delete({question_id: {id: updateDto.question_id}});
 
@@ -97,7 +102,8 @@ export class AnswerService {
       createDto.answer_content = updateDto.answer_content;
       createDto.question_id = updateDto.question_id;
 
-      await this.create(createDto);
+      const updateAnswer = await this.create(createDto);
+      return updateAnswer
       
     } catch (err) {
       return err;
