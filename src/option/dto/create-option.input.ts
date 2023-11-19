@@ -6,7 +6,7 @@ export class CreateOptionDto {
   
   @Field(() => [String], { nullable: false })
   @IsNotEmpty({ each: true })
-  @Length(0, 20, { each: true })
+  @Length(1, 20, { each: true })
   option_content: string[];
 
   @Field({nullable: false})
