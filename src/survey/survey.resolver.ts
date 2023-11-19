@@ -26,11 +26,11 @@ export class SurveyResolver {
   
   @Mutation(() => Surveys, {description: '설문지 수정', nullable: true})
   async updateSurvey(@Args() updateDto: UpdateSurveyDto) {
-    await this.surveyService.updateSurvey(updateDto);
+    return await this.surveyService.updateSurvey(updateDto);
   }
 
   @Mutation(() => Surveys, {description: '설문지 삭제', nullable : true})
   async deleteSurvey(@Args('id', { type: () => Int })id: number) {
-    await this.surveyService.deleteSurvey(id);
+    return await this.surveyService.deleteSurvey(id);
   }
 }

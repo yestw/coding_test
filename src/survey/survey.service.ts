@@ -108,12 +108,19 @@ export class SurveyService {
 
   //단방향 연관관계로 자식 데이터 먼저 삭제
   async deleteQuestion(id: number) {
-    const question = await this.questionRepository.findOne({where: {survey_id: {id: id}}});
-    if(question) {
-      await this.answerRepositoy.delete({question_id: {id: question.id}});
-      await this.optionRepository.delete({question_id: {id: question.id}});
-      await this.questionRepository.delete({ survey_id: { id: id } });
-    }
+    const questions = await this.questionRepository.createQueryBuilder('question')
+      .leftJoinAndSelect('question.survey_id', 'survey')
+      .where('question.survey_id = :survey_id', {survey_id : id})
+      .getMany();
+      if(questions && questions.length > 0) {
+        await Promise.all(
+          questions.map(async (q) => {
+            await this.answerRepositoy.delete({question_id: {id: q.id}});
+            await this.optionRepository.delete({question_id: {id: q.id}});
+            await this.questionRepository.delete({ survey_id: { id: q.survey_id.id } });
+          })
+        )
+      }
   }
 
   //설문지 조회시 없으면 발생하는 예외
