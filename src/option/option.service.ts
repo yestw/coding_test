@@ -27,6 +27,11 @@ export class OptionService {
         throw new CustomException(QuestionException.QUESTION_NOT_EXISTS);
       };
 
+      if(createDto.option_content.length !== createDto.score.length) {
+        this.logger.error('등록 하려는 선택지 개수만큼 점수를 추가해주세요')
+        throw new CustomException(OptionException.OPTION_CREATE_FAIL);
+      }
+
       const savedOptions: Options[] = await Promise.all(
         createDto.option_content.map(async (option, index) => {
           const newOption = new Options();
