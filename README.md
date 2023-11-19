@@ -35,7 +35,7 @@ $ npm run start
 ```bash
 http://localhost:4000/graphql
 ```
-<a href="https://www.notion.so/3-20de16e08df947a1909ca22546d3e571">graphql 요청 - 노션 정리</a>
+<a href="https://mire-wound-f4b.notion.site/3-3e24b2f72de74cd1b901abe66490a1e0?pvs=4">graphql 요청 - 노션 정리</a>
 
 ## flow
  설문지 등록 -> 문항 등록 -> 선택지 등록 -> 답변 등록 -> 설문지 조회: 완성된 설문지 조회
